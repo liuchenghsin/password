@@ -10,27 +10,32 @@
 
 <style>
 body{
-font-family:sans-serif;
-background:#0f172a;
-color:white;
-text-align:center;
-padding:40px;
+  font-family:sans-serif;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+  padding:40px;
 }
 input{
-padding:12px;
-font-size:18px;
-margin:10px;
-border-radius:8px;
-border:none;
+  padding:12px;
+  font-size:18px;
+  margin:10px;
+  border-radius:8px;
+  border:none;
 }
 button{
-padding:12px 20px;
-font-size:18px;
-background:#22c55e;
-border:none;
-border-radius:8px;
-color:white;
-cursor:pointer;
+  padding:12px 20px;
+  font-size:18px;
+  background:#22c55e;
+  border:none;
+  border-radius:8px;
+  color:white;
+  cursor:pointer;
+}
+#status{
+  margin-top:16px;
+  font-size:18px;
+  color:#facc15;
 }
 </style>
 </head>
@@ -44,50 +49,60 @@ cursor:pointer;
 
 <button onclick="submitPassword()">送出</button>
 
-<script>
+<div id="status"></div>
 
+<script>
 const ATTACK_RATE = 1e12;
 
 function getCharsetSize(pwd){
-let size=0;
-if(/[a-z]/.test(pwd)) size+=26;
-if(/[A-Z]/.test(pwd)) size+=26;
-if(/[0-9]/.test(pwd)) size+=10;
-if(/[^a-zA-Z0-9]/.test(pwd)) size+=32;
-return size||1;
+  let size=0;
+  if(/[a-z]/.test(pwd)) size+=26;
+  if(/[A-Z]/.test(pwd)) size+=26;
+  if(/[0-9]/.test(pwd)) size+=10;
+  if(/[^a-zA-Z0-9]/.test(pwd)) size+=32;
+  return size||1;
 }
 
 function calcYears(pwd){
-const charset=getCharsetSize(pwd);
-const combos=Math.pow(charset,pwd.length);
-const seconds=combos/ATTACK_RATE;
-return seconds/(60*60*24*365);
+  const charset=getCharsetSize(pwd);
+  const combos=Math.pow(charset,pwd.length);
+  const seconds=combos/ATTACK_RATE;
+  return seconds/(60*60*24*365);
 }
 
 function submitPassword(){
+  const status = document.getElementById("status");
+  const name = document.getElementById("name").value.trim();
+  const pwd = document.getElementById("pwd").value;
 
-const name=document.getElementById("name").value;
-const pwd=document.getElementById("pwd").value;
+  if(!name || !pwd){
+    status.textContent = "請輸入暱稱與密碼";
+    return;
+  }
 
-if(!name || !pwd){
-alert("請輸入暱稱與密碼");
-return;
+  if(typeof db === "undefined"){
+    status.textContent = "Firebase 尚未正確初始化，請檢查 firebase-config.js";
+    console.error("db 未定義，請檢查 firebase-config.js");
+    return;
+  }
+
+  const years = calcYears(pwd);
+
+  db.ref("passwordGame").push({
+    name: name,
+    pwd: pwd,
+    years: years,
+    time: Date.now()
+  })
+  .then(() => {
+    status.textContent = "已成功送出！";
+    document.getElementById("pwd").value = "";
+  })
+  .catch((error) => {
+    status.textContent = "送出失敗，請查看主控台錯誤";
+    console.error("Firebase 寫入失敗：", error);
+  });
 }
-
-const years=calcYears(pwd);
-
-db.ref("passwordGame").push({
-name:name,
-pwd:pwd,
-years:years,
-time:Date.now()
-});
-
-alert("已送出！");
-document.getElementById("pwd").value="";
-
-}
-
 </script>
 
 </body>
