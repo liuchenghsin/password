@@ -1,24 +1,13 @@
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+const firebaseConfig = {
+  apiKey: "AIzaSyDNkmLQbmaUMgN3ASAg7gi-U-zn9AMDvAM",
+  authDomain: "passworddefender-73aab.firebaseapp.com",
+  databaseURL: "https://passworddefender-73aab-default-rtdb.firebaseio.com",
+  projectId: "passworddefender-73aab",
+  storageBucket: "passworddefender-73aab.firebasestorage.app",
+  messagingSenderId: "270944179994",
+  appId: "1:270944179994:web:0c36cf807ace1b6fe7bea3",
+  measurementId: "G-QGPW9LVD4V"
+};
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyDNkmLQbmaUMgN3ASAg7gi-U-zn9AMDvAM",
-    authDomain: "passworddefender-73aab.firebaseapp.com",
-    databaseURL: "https://passworddefender-73aab-default-rtdb.firebaseio.com",
-    projectId: "passworddefender-73aab",
-    storageBucket: "passworddefender-73aab.firebasestorage.app",
-    messagingSenderId: "270944179994",
-    appId: "1:270944179994:web:0c36cf807ace1b6fe7bea3",
-    measurementId: "G-QGPW9LVD4V"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
