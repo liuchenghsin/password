@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>密碼防禦排行榜</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<style>
+body{
+font-family:sans-serif;
+background:#020617;
+color:white;
+text-align:center;
+padding:20px;
+}
+
+h1{
+font-size:48px;
+color:#38bdf8;
+}
+
+table{
+margin:auto;
+border-collapse:collapse;
+width:600px;
+font-size:26px;
+}
+
+th,td{
+padding:14px;
+border-bottom:1px solid #334155;
+}
+
+.gold{background:#ca8a04;}
+.silver{background:#94a3b8;}
+.bronze{background:#b45309;}
+
+#timer{
+font-size:36px;
+color:#facc15;
+margin:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🏆 密碼防禦排行榜</h1>
+
+<div id="timer">10:00</div>
+
+<table>
+<thead>
+<tr>
+<th>排名</th>
+<th>暱稱</th>
+<th>破解時間(年)</th>
+<th id="pwdHeader" style="display:none;">密碼</th>
+</tr>
+</thead>
+
+<tbody id="board"></tbody>
+</table>
+
+<script>
+
+let leaderboard=[];
+let reveal=false;
+
+db.ref("passwordGame").on("value",(snapshot)=>{
+
+const data=snapshot.val();
+
+leaderboard=[];
+
+for(let id in data){
+leaderboard.push(data[id]);
+}
+
+leaderboard.sort((a,b)=>b.years-a.years);
+leaderboard=leaderboard.slice(0,3);
+
+render();
+
+});
+
+function formatYears(y){
+if(y>1e9) return "∞";
+if(y<0.01) return "<0.01";
+return y.toFixed(2);
+}
+
+function render(){
+
+const tbody=document.getElementById("board");
+tbody.innerHTML="";
+
+leaderboard.forEach((p,i)=>{
+
+let cls="";
+if(i==0) cls="gold";
+if(i==1) cls="silver";
+if(i==2) cls="bronze";
+
+let row=`<tr class="${cls}">
+<td>${i+1}</td>
+<td>${p.name}</td>
+<td>${formatYears(p.years)}</td>`;
+
+if(reveal){
+row+=`<td>${p.pwd}</td>`;
+}
+
+row+="</tr>";
+
+tbody.innerHTML+=row;
+
+});
+
+}
+
+let time=600;
+
+setInterval(()=>{
+
+if(time<=0) return;
+
+time--;
+
+let m=Math.floor(time/60);
+let s=time%60;
+
+document.getElementById("timer").textContent=
+`${m}:${s.toString().padStart(2,"0")}`;
+
+if(time==0){
+reveal=true;
+document.getElementById("pwdHeader").style.display="";
+render();
+}
+
+},1000);
+
+</script>
+
+</body>
+</html>

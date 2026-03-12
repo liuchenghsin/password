@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>密碼防禦挑戰</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<style>
+body{
+font-family:sans-serif;
+background:#0f172a;
+color:white;
+text-align:center;
+padding:40px;
+}
+input{
+padding:12px;
+font-size:18px;
+margin:10px;
+border-radius:8px;
+border:none;
+}
+button{
+padding:12px 20px;
+font-size:18px;
+background:#22c55e;
+border:none;
+border-radius:8px;
+color:white;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔐 密碼防禦挑戰</h1>
+
+<input id="name" placeholder="你的暱稱"><br>
+<input id="pwd" type="password" placeholder="你的密碼"><br>
+
+<button onclick="submitPassword()">送出</button>
+
+<script>
+
+const ATTACK_RATE = 1e12;
+
+function getCharsetSize(pwd){
+let size=0;
+if(/[a-z]/.test(pwd)) size+=26;
+if(/[A-Z]/.test(pwd)) size+=26;
+if(/[0-9]/.test(pwd)) size+=10;
+if(/[^a-zA-Z0-9]/.test(pwd)) size+=32;
+return size||1;
+}
+
+function calcYears(pwd){
+const charset=getCharsetSize(pwd);
+const combos=Math.pow(charset,pwd.length);
+const seconds=combos/ATTACK_RATE;
+return seconds/(60*60*24*365);
+}
+
+function submitPassword(){
+
+const name=document.getElementById("name").value;
+const pwd=document.getElementById("pwd").value;
+
+if(!name || !pwd){
+alert("請輸入暱稱與密碼");
+return;
+}
+
+const years=calcYears(pwd);
+
+db.ref("passwordGame").push({
+name:name,
+pwd:pwd,
+years:years,
+time:Date.now()
+});
+
+alert("已送出！");
+document.getElementById("pwd").value="";
+
+}
+
+</script>
+
+</body>
+</html>
